@@ -20,10 +20,25 @@ def p2_2(lr=0.1, W0=[0,0,0], epochs=50):
 	L = [L1,L2,L3]
 	
 	
-	for i in range(epochs):
+	for _ in range(epochs):
 		
-		for j in range(len(Li)):
+		# Updating Loss
+		for j in range(len(L)):
 			L[j] = (X[j]*W[j] - y[j]) ** 2
+
+		# Calculating gradients
+		grad = [0,0,0]
+		for k,Xi in enumerate(X):
+			grad[k] += Xi
+		for g in grad:
+			g = g / len(X)
 		
+		# Updating weights
 		for weight in W:
-			weight = weight - lr*mean(gradient)
+			weight = weight - lr * grad
+
+
+def main():
+
+	return 0
+main()
