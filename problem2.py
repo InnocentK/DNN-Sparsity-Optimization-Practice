@@ -18,7 +18,7 @@ def p2_2(lr=0.1, W0=[0,0,0], epochs=50):
 	W = W0
 	y = [y1,y2,y3]
 	L = [L1,L2,L3]
-	
+	#grad = [[0,0,0], [0,0,0], [0,0,0]]
 	
 	for _ in range(epochs):
 		
@@ -27,15 +27,13 @@ def p2_2(lr=0.1, W0=[0,0,0], epochs=50):
 			L[j] = (X[j]*W[j] - y[j]) ** 2
 
 		# Calculating gradients
-		grad = [0,0,0]
-		for k,Xi in enumerate(X):
-			grad[k] += Xi
-		for g in grad:
-			g = g / len(X)
+		#grad = [0,0,0]
+		#for k,Xi in enumerate(X):
+			#grad[k] += Xi
 		
 		# Updating weights
 		for weight in W:
-			weight = weight - lr * grad
+			weight = weight - lr #* (DECAY**(EPOCHS // DECAY_EPOCHS)) <- see Lab 2
 
 
 def main():
