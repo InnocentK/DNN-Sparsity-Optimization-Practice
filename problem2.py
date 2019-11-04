@@ -37,9 +37,9 @@ def terngrad(grads, clipGrads=False, T=5):
 	for grad in grads:
 		prob_s = 0
 		if max_grad != 0:
-			prob_s = abs(grad) / max_grad
-		new_grad = max_grad * isTarget(prob_s) * np.sign(grad)
-		tern.append(new_grad)
+			prob_s = abs(grad[0]) / max_grad
+		new_grad = max_grad * isTarget(prob_s) * np.sign(grad[0])
+		tern.append([new_grad])
 	return tern
 
 #
@@ -57,42 +57,40 @@ def p2(lr=0.1, W0=[ [0.0],[0.0],[0.0] ], epochs=50, isQuantize=False, isClip=Fal
 	
 	X = np.array([X1,X2,X3], dtype=np.float64)
 	W = np.array(W0, dtype=np.float64)
-	old_W = np.array(W0, dtype=np.float64)
 	y = np.array([y1,y2,y3], dtype=np.float64)
 	L = np.array([L1,L2,L3], dtype=np.float64)
-	all_loss = []
 	
-	for i in range(epochs):
+	grads = np.array(W0, dtype=np.float64)
+	all_loss = []
+	num_workers = len(L)
+	
+	for _ in range(epochs):
 		
 		# Updating Loss
-		for j in range(len(L)):
-			loss = ( X[j] * W - y[j]) ** 2
-			L[j] = np.mean(loss, dtype=np.float64)
-		all_loss.append(np.log(L))
+		for j in range(num_workers):
+			L[j] = ( np.dot(X[j],W) - y[j] ) ** 2
 
-		# Calculating gradients
-		grad = np.array([0.0,0.0,0.0], dtype=np.float64)
-		for k,_ in enumerate(W):
-			grad[k] = (W[k] - old_W[k]) #* L[k]
+			# Calculating gradients
+			grad = 2*X[j] * ( np.dot(X[j],W) - y[j])
+			grads[j][0] = np.mean(grad, dtype=np.float64) # Change this for regulaization to sum
 
 			# Gradient Clipping
-			if isClip and not isQuantize and abs(grad[k]) > thresh:
-				grad[k] = thresh * np.sign(grad[k])
-
+			if isClip and not isQuantize and abs(grads[j][0]) > thresh:
+				grads[j][0] = thresh * np.sign(grads[j][0])
+		
+		all_loss.append(np.log(L))
+		
 		# Quantizing the gradient
 		if isQuantize:
-			grad = terngrad(grad, isClip, thresh)
-		#avg_grad = np.mean(grad, dtype=np.float64)
+			grads = np.array( terngrad(grads, isClip, thresh) )
+
+		avg_grad = np.mean(grads, dtype=np.float64)
 
 		# Updating weights
-		old_W = np.copy(W)
-		for n,weight in enumerate(W):
-			if i >= 1:
-				W[n][0] = weight[0] - lr * grad[n]#avg_grad
-			else:
-				W[n][0] = weight[0] - lr
-		#print(W)
-		#print()
+		for k,weight in enumerate(W):
+				W[k][0] = weight[0] - lr * avg_grad
+		#print(W, '\n')
+		#print(avg_grad, '\n')
 	return all_loss
 
 def main():
@@ -100,7 +98,7 @@ def main():
 	# Problem 2.2
 	loss2_2 = p2()
 	print2CSV(loss2_2,"p2-2")
-
+	#"""
 	# Problem 2.3
 	loss2_3 = p2(isQuantize=True)
 	print2CSV(loss2_3,"p2-3")
@@ -114,6 +112,6 @@ def main():
 	# Problem 2.5
 	loss2_5 = p2(isQuantize=True, isClip=True, thresh=5)
 	print2CSV(loss2_5,"p2-5")
-
+	#"""
 	return 0
 main()
