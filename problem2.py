@@ -42,6 +42,26 @@ def terngrad(grads, clipGrads=False, T=5):
 		tern.append([new_grad])
 	return tern
 
+# Calculates optimal W
+def p2_1():
+
+	optimal_w = []
+
+	X1 = np.array([-1.0,2.0,0.0])
+	y1 = -7.0
+	X2 = np.array([3.0,0.0,1.0])
+	y2 = 5.0
+	X3 = np.array([2.0,-1.0,3.0])
+	y3 = 11.0
+	
+	X = np.array([X1,X2,X3], dtype=np.float64)
+	y = np.array([y1,y2,y3], dtype=np.float64)
+
+	inv_X = np.linalg.inv(X)
+	optimal_w = np.dot(y,inv_X)
+
+	return optimal_w
+
 #
 def p2(lr=0.1, W0=[ [0.0],[0.0],[0.0] ], epochs=50, isQuantize=False, isClip=False, thresh=1):
 	
@@ -94,6 +114,9 @@ def p2(lr=0.1, W0=[ [0.0],[0.0],[0.0] ], epochs=50, isQuantize=False, isClip=Fal
 	return all_loss
 
 def main():
+
+	# Problem 2.1
+	print( p2_1() )
 
 	# Problem 2.2
 	loss2_2 = p2()
