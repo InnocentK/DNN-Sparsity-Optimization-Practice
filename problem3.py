@@ -1,11 +1,15 @@
-#
-#
-#
+# File_name:  problem3.py
+# Author:     Innocent Kironji
+# Date:       11/06/2019
+# Class:      ECE590-11 (Special Topics in ML)
+# Description: 
+#    Weight update simulating using gradient manipulation and regularization
 
 import numpy as np
 import math
 import random
 
+# Prints data to a csv file
 def print2CSV(loss, weights, name="p3-1"):
 	out_file = open("./" + name + "_results.csv", "w")
 
@@ -44,12 +48,16 @@ def l0_prune(weights, thresh):
 
 	return new_weights
 
+# Calculates the proximal gradient update for given weights
 def proximal(weights, thresh, lambd, doTrim):
 	new_weights = np.copy(weights)
 	smallest_vals = None
+
+	# When doing l1 trim
 	if doTrim:
 		smallest_vals = np.argsort(new_weights.flatten())
 
+		# Proximal update only on the 3 smallest elements
 		for i in range(3):
 			idx = smallest_vals[i]
 			weight = new_weights[idx]
@@ -59,6 +67,7 @@ def proximal(weights, thresh, lambd, doTrim):
 			else:
 				new_weights[idx][0] = 0
 
+	# Otherwise proximal update on all elements
 	else:
 		for i,weight in enumerate(weights):
 
@@ -69,7 +78,7 @@ def proximal(weights, thresh, lambd, doTrim):
 
 	return new_weights
 
-#
+# All weight updates and loss calculations are done in this function
 def p3(lr=0.02, W0=[ [0.0],[0.0],[0.0],[0.0],[0.0] ], epochs=200, doL0Prune=False, thresh=2, doLasso=False, lambd=0.2, doProximal=False, mu=0.004, doTrim=False, only2Pnts=False):
 	
 	X1 = np.array([1.0,-2.0,-1.0,-1.0,1.0])
@@ -84,6 +93,7 @@ def p3(lr=0.02, W0=[ [0.0],[0.0],[0.0],[0.0],[0.0] ], epochs=200, doL0Prune=Fals
 	y = np.array([y1,y2,y3], dtype=np.float64)
 	L = 0.0
 	
+	# When you only want to consider 2 data points the third point is removed
 	if only2Pnts:
 		X = np.array([X1,X2], dtype=np.float64)
 		y = np.array([y1,y2], dtype=np.float64)
@@ -93,7 +103,7 @@ def p3(lr=0.02, W0=[ [0.0],[0.0],[0.0],[0.0],[0.0] ], epochs=200, doL0Prune=Fals
 	all_weights = []
 	num_workers = len(X)
 	
-	for i in range(epochs):
+	for _ in range(epochs):
 		
 		# Updating Loss
 		losses = np.zeros(num_workers)
@@ -126,7 +136,6 @@ def p3(lr=0.02, W0=[ [0.0],[0.0],[0.0],[0.0],[0.0] ], epochs=200, doL0Prune=Fals
 		# Proximal Update
 		if doProximal:
 			W = proximal(W,L,mu, doTrim)
-
 		all_weights.append(W)
 
 	return all_loss, all_weights
@@ -161,7 +170,8 @@ def main():
 		print2CSV(loss3_5, weight3_5, "p3-5_lamda=" + str(lambdas[i]) + "_mu=" + str(mu) )
 
 
-	# Problem 3.6
+	# Problem 3.6 (subparts relate to what part in problem 3 is being redone with 2 data points)
+
 	# Problem 3.6.1
 	loss3_6_1, weight3_6_1 = p3(only2Pnts=True)
 	print2CSV(loss3_6_1, weight3_6_1, "p3-6-1")

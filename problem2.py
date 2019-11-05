@@ -1,11 +1,15 @@
-#
-#
-#
+# File_name:  problem2.py
+# Author:     Innocent Kironji
+# Date:       11/06/2019
+# Class:      ECE590-11 (Special Topics in ML)
+# Description: 
+#    Weight update simulating using compression methods
 
 import numpy as np
 import math
 import random
 
+# Prints out data to a csv file
 def print2CSV(loss, name="p2-2"):
 	out_file = open("./" + name + "_results.csv", "w")
 
@@ -62,7 +66,7 @@ def p2_1():
 
 	return optimal_w
 
-#
+# All weight updates and loss calculations are done in this function
 def p2(lr=0.1, W0=[ [0.0],[0.0],[0.0] ], epochs=50, isQuantize=False, isClip=False, thresh=1):
 	
 	X1 = np.array([-1.0,2.0,0.0])
@@ -109,8 +113,7 @@ def p2(lr=0.1, W0=[ [0.0],[0.0],[0.0] ], epochs=50, isQuantize=False, isClip=Fal
 		# Updating weights
 		for k,weight in enumerate(W):
 				W[k][0] = weight[0] - lr * avg_grad
-		#print(W, '\n')
-		#print(avg_grad, '\n')
+
 	return all_loss
 
 def main():
